@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import Colors from "../theme/Colors";
 
@@ -11,6 +12,7 @@ const Container = styled.div`
 
 const CityCard = styled.div`
   display: flex;
+  flex-direction: column;
   background-color: white;
   align-self: center;
   height: 50%;
@@ -29,15 +31,44 @@ const StyledInput = styled.input`
 const StyledButton = styled.button`
   border-radius: 8px;
   font-size: 16px;
-  width: 98%;
+  width: 50%;
   height: 2rem;
   margin: 0.5rem 0;
 `;
 
+const SearchedContainer = styled.div`
+  margin-top: 20px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  margin-top: 5px;
+`;
+
 const City = () => {
+  const [cityName, setCityName] = useState("");
+  const [searchedCities, setSearchedCities] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleInputChange = (event) => {
+    setCityName(event.target.value);
+    setErrorMessage("");
+  };
+
   const searchCity = (event) => {
     event.preventDefault();
-    console.log("submit to search city");
+    if (cityName.trim() !== "") {
+      const updatedCities = [cityName, ...searchedCities.slice(0, 4)];
+      setSearchedCities(updatedCities);
+      setCityName("");
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Please enter a city name");
+    }
   };
 
   return (
@@ -45,10 +76,23 @@ const City = () => {
       <CityCard>
         <form onSubmit={searchCity}>
           <label>
-            <StyledInput type="text" name="city_name" placeholder="City Name" />
+            <StyledInput
+              type="text"
+              name="city_name"
+              placeholder="City Name"
+              value={cityName}
+              onChange={handleInputChange}
+            />
           </label>
           <StyledButton type="submit">Search</StyledButton>
         </form>
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+        <SearchedContainer>
+          Searched City:
+          {searchedCities.slice(0, 5).map((city, index) => (
+            <StyledButton key={index}>{city}</StyledButton>
+          ))}
+        </SearchedContainer>
       </CityCard>
     </Container>
   );
